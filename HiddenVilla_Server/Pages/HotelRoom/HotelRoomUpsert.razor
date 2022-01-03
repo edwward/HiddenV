@@ -6,18 +6,25 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <EditForm Model="@HotelRoomModel">
+               @* onvalidsubmit zajisti ze budu fungovat validace, kterou mam v hotelroomdto.cs, jeste musim nize 
+                doplnit DataAnnotationsValidator a ValidationSummary*@
+                <EditForm Model="@HotelRoomModel" OnValidSubmit="HandleHotelRoomUpsert">
+                    <DataAnnotationsValidator/>
+                    @*<ValidationSummary/>*@
                     <div class="form-group">
                         <label>Name</label>
                         <InputText @bind-Value="HotelRoomModel.Name" class="form-control"></InputText>
+                        <ValidationMessage For="() => HotelRoomModel.Name"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Occupancy</label>
                         <InputNumber @bind-Value="HotelRoomModel.Occupancy" class="form-control"></InputNumber>
+                         <ValidationMessage For="() => HotelRoomModel.Occupancy"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Rate</label>
                         <InputNumber @bind-Value="HotelRoomModel.RegularRate" class="form-control"></InputNumber>
+                         <ValidationMessage For="() => HotelRoomModel.RegularRate"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>SqFt</label>
@@ -41,4 +48,9 @@
 {
     private HotelRoomDto HotelRoomModel { get; set; } = new HotelRoomDto();
     private string Title { get; set; } = "Create";
+
+    private async Task HandleHotelRoomUpsert()
+    {
+        HotelRoomModel.Details = "Button clicked";
+    }
 }
