@@ -1,0 +1,127 @@
+﻿@*Toto je routable component - odkazuje na webpage index/demohotel. Jine komponenty tuto page direktivu nemaji*@
+@page "/demohotel"
+@using Model
+
+
+<PageTitle>Demo Hotel</PageTitle>
+<div class="container">
+    <div class="bg-light border p-2">
+        <h2>We will display hotel rooms and amenities here!</h2>
+        <h2 class="text-info">Room List</h2>
+        <span>Rooms Selected = @SelectedRooms</span>
+        <div class="row">
+            @foreach (var room in RoomsList)
+            {
+                <div class="col-md-4">
+                    @*pass RoomSelectionCounterChanged parent metodu do child komponentu IndividualRoom*@
+                    <IndividualRoom OnRoomCheckBoxSelection="RoomSelectionCounterChanged" Room="@room"></IndividualRoom>
+                </div>
+            }
+        </div>
+        <h2 class="text-info">Amenity List</h2>
+        <div class="row">
+            @foreach (var amenity in AmenitiesList)
+            {
+                <div class="col-md-4">
+                    <IndividualAmenity OnAmenitySelection="AmenitySelectionChanged" Amenity="@amenity">
+                        @*use two fragments from individualamenity.razor*@
+                        <FirstRenderFrag>1#</FirstRenderFrag>
+                        <SecondRenderFrag>2#</SecondRenderFrag>
+                    </IndividualAmenity>
+                </div>
+            }
+        </div>
+        <span>Amenity Selected: @SelectedAmenity</span>
+    </div>
+</div>
+
+@*Veskery c# kod k danemu komponentu je uzavren v code bloku*@
+@code
+{
+    public int SelectedRooms { get; set; } = 0;
+    public string SelectedAmenity { get; set; }
+    List<BlazorRoom> RoomsList = new();
+    List<BlazorAmenity> AmenitiesList = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        RoomsList.Add(new BlazorRoom
+            {
+                Id = 101,
+                RoomName = "Villa Suite One Bedroom",
+                IsActive = true,
+                Price = 499,
+                RoomProperties = new List<BlazorRoomProperties>
+            {
+                new BlazorRoomProperties { Id = 1, Name = "SqFt", Value = "100"},
+                new BlazorRoomProperties { Id = 2, Name = "Occupancy", Value = "3"}
+            }
+            });
+
+        RoomsList.Add(new BlazorRoom
+            {
+                Id = 102,
+                RoomName = "Villa Suite Two Bedroom",
+                IsActive = true,
+                Price = 799,
+                RoomProperties = new List<BlazorRoomProperties>
+            {
+                new BlazorRoomProperties { Id = 1, Name = "SqFt", Value = "150"},
+                new BlazorRoomProperties { Id = 2, Name = "Occupancy", Value = "4"}
+            }
+            });
+
+        RoomsList.Add(new BlazorRoom
+            {
+                Id = 103,
+                RoomName = "Villa Suite Three Bedroom",
+                IsActive = true,
+                Price = 1199,
+                RoomProperties = new List<BlazorRoomProperties>
+            {
+                new BlazorRoomProperties { Id = 1, Name = "SqFt", Value = "220"},
+                new BlazorRoomProperties { Id = 2, Name = "Occupancy", Value = "10"}
+            }
+            });
+
+        AmenitiesList.Add(new BlazorAmenity
+            {
+                Id = 111,
+                Name = "Gym",
+                Description = "Great gym room available"
+            });
+
+        AmenitiesList.Add(new BlazorAmenity
+            {
+                Id = 222,
+                Name = "Swimming Pool",
+                Description = "Pool room available"
+            });
+
+        AmenitiesList.Add(new BlazorAmenity
+            {
+                Id = 333,
+                Name = "Free Breakfast",
+                Description = "Enjoy free breakfast"
+            });
+    }
+
+    protected void RoomSelectionCounterChanged(bool isRoomSelected)
+    {
+        if (isRoomSelected)
+        {
+            SelectedRooms++;
+        }
+        else
+        {
+            SelectedRooms--;
+        }
+    }
+
+    protected void AmenitySelectionChanged(string amenity)
+    {
+        SelectedAmenity = amenity;
+    }
+}

@@ -1,0 +1,26 @@
+﻿<div>
+    <h4 class="text-primary pt-3">Another Child Component</h4>
+    @*attribute splatting - InputAttributes*@
+    <input id="roomName" @attributes="InputAttributes" class="form-control" />
+</div>
+
+@code 
+{
+    //[Parameter]
+    //public string Placeholder { get; set; } = "Initial Text";
+
+    //[Parameter]
+    //public string Required { get; set; } = "required";
+
+    //[Parameter]
+    //public string MaxLength { get; set; } = "10";
+
+    //Attribute splatting - misto vypisovani atributu vyse
+    [Parameter]
+    public Dictionary<string, object> InputAttributes { get; set; } = new()
+        {
+            { "required", "required" },
+            { "placeholder", "Initial Text" },
+            { "maxlength", 10 }
+        };
+}

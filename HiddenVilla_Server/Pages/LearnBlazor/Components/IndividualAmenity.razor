@@ -1,0 +1,29 @@
+﻿@using HiddenVilla_Server.Model
+
+@*kdyz chci pouzit onclick je treba predat mouseeventargs v parametru*@
+<div class="bg-light border p-2" @onclick="(args) => AmenitySelectionChanged(args, Amenity.Name)">
+  <h5 class="text-secondary">Amenity - @Amenity.Id</h5> <br />
+         @Amenity.Name <br />
+         @Amenity.Description <br /> 
+         RF from parent - @FirstRenderFrag @SecondRenderFrag
+</div>
+
+@code 
+{
+    [Parameter]
+    public BlazorAmenity Amenity { get; set; }
+   
+    [Parameter]
+    public RenderFragment FirstRenderFrag { get; set; }
+
+    [Parameter]
+    public RenderFragment SecondRenderFrag { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnAmenitySelection { get; set; }
+
+    protected async Task AmenitySelectionChanged(MouseEventArgs e, string name)
+    {
+        await OnAmenitySelection.InvokeAsync((string)name);
+    }
+}

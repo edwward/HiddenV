@@ -1,0 +1,15 @@
+﻿@*Tento komponent nema page direktivu. Bude se pouzivat v ramci jine komponenty*@
+
+@*zobraz buttony pouze pro adminy*@ 
+@if (IsAdmin)
+{
+    <input type="button" class="btn btn-danger" value="Delete" />
+    <input type="button" class="btn btn-success" value="Edit" />
+}
+
+@code 
+{
+    [Parameter]
+    public bool IsAdmin { get; set; }
+
+}

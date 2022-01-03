@@ -1,0 +1,35 @@
+﻿@*navigateble component*@
+@page "/parentcomponent" 
+
+<h1 class="text-danger">Parent Child</h1>
+<CascadingValue Value="@messageForGrandchild">
+    <CascadingValue Value="@LuckyNumberFromGrandParent">
+        <Child OnBtnClicked="ShowMessage" Title="This is passed from parent component as parameter. Styling comes from child comp">
+            Render fragment displayed in parent from child component
+        </Child>
+    </CascadingValue>
+</CascadingValue>
+
+<AnotherChild InputAttributes="InputAttributesFromParent"></AnotherChild>
+
+<p>@messageText</p>
+
+@code 
+{
+    public int LuckyNumberFromGrandParent { get; set; } = 7;
+    private string messageForGrandchild = "message from grandparent component";
+    private string messageText = "";
+
+    private void ShowMessage(MouseEventArgs e)
+    {
+        messageText = "Text from parent";
+    }
+
+    @*attribute splatting - prepisuju zde to to prichazi z child componenty AnotherChild.razor*@
+    public Dictionary<string, object> InputAttributesFromParent { get; set; } = new()
+        {
+            { "required", "required" },
+            { "placeholder", "Enter the room name" },
+            { "maxlength", 5 }
+        };
+}

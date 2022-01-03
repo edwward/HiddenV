@@ -1,0 +1,31 @@
+﻿@page "/advancedroutingexample"
+@inject NavigationManager NavigationManager
+
+<h3>AdvancedRoutingExample</h3>
+<h4>Parameter 1 - @Parameter1</h4>
+<h4>Parameter 2 - @Parameter2</h4>
+
+<button class="btn btn-primary" @onclick="LoadParameters">Load Parameters</button>
+<NavLink href="/routingexample" class="btn btn-secondary">Back to routing example</NavLink>
+@*<h href="/routingexample" class="btn btn-secondary">Back to routing</h>*@
+<button class="btn btn-secondary" @onclick="BackToRouting">Backt to routing example with function</button>
+
+
+@code 
+{
+    private string Parameter1;
+    private string Parameter2;
+
+    private void LoadParameters()
+    {
+        var absoluteUri = new Uri(NavigationManager.Uri);
+        var queryParam = System.Web.HttpUtility.ParseQueryString(absoluteUri.Query);
+        Parameter1 = queryParam["Parameter1"];
+        Parameter2 = queryParam["Parameter2"];
+    }
+
+    private void BackToRouting()
+    {
+        NavigationManager.NavigateTo("routingexample"); 
+    }
+}
