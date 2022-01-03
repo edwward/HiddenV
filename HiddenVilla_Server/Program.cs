@@ -1,3 +1,5 @@
+using Business.Repository;
+using Business.Repository.IRepository;
 using DataAccess.Data;
 using HiddenVilla_Server.Data;
 using Microsoft.AspNetCore.Components;
@@ -14,6 +16,7 @@ builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IHotelRoomRepository, HotelRoomRepository>();
 
 var app = builder.Build();
 

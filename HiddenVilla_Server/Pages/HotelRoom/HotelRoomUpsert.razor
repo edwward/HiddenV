@@ -1,5 +1,8 @@
 ﻿@page "/hotel-room/create"
 @using Models
+@using Business.Repository.IRepository
+@inject IHotelRoomRepository HotelRoomRepository
+@inject NavigationManager NavigationManager
 
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">Create Hotel Room</h3>
@@ -51,6 +54,18 @@
 
     private async Task HandleHotelRoomUpsert()
     {
-        HotelRoomModel.Details = "Button clicked";
+        //pokud je validace ok, muzeme pridat room
+        var roomDetailsByName = await HotelRoomRepository.IsRoomUnique(HotelRoomModel.Name);
+
+        if (roomDetailsByName != null)
+        {
+            //duplicate room
+            return;
+        }
+
+        //create room
+        var createdResult = await HotelRoomRepository.CreateHotelRoom(HotelRoomModel);
+        NavigationManager.NavigateTo("hotel-room");
     }
+    
 }
