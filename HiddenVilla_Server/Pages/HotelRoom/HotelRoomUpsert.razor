@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-body">
                @* onvalidsubmit zajisti ze budu fungovat validace, kterou mam v hotelroomdto.cs, jeste musim nize 
-                doplnit DataAnnotationsValidator a ValidationSummary*@
+                doplnit DataAnnotationsValidator*@
                 <EditForm Model="@HotelRoomModel" OnValidSubmit="HandleHotelRoomUpsert">
                     <DataAnnotationsValidator/>
                     @*<ValidationSummary/>*@

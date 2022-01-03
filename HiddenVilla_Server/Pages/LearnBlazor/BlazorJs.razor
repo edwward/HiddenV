@@ -1,0 +1,45 @@
+﻿@page "/blazorjs"
+
+@*javascript knihovna kterou musim pouzit chci-li pouzit js*@
+@inject IJSRuntime JsRuntime 
+
+<h3>BlazorJs</h3>
+
+<div class="row">
+    <button class="btn btn-secondary col-3 m-2"  @onclick="TestConfirm">Test confirm</button>
+    <button class="btn btn-success col-3 m-2"  @onclick="TestSuccess">Test confirm</button>
+    <button class="btn btn-danger col-3 m-2"  @onclick="TestFailure">Test failure</button>
+</div>
+
+<div class="row">
+   @if (ConfirmResult)
+    {
+        <p>Confirmation has been made!</p>
+    } 
+    else
+    {
+        <p>Confirmation pending!</p>
+    }
+</div>
+
+@code 
+{
+    private string ConfirmMessage = "Do you really want to click?";
+    private bool ConfirmResult { get; set; }
+
+    private async Task TestConfirm()
+    {
+        ConfirmResult = await JsRuntime.InvokeAsync<bool>("confirm", ConfirmMessage);
+    }
+
+    //test toastr js messages
+    private async Task TestSuccess()
+    {
+        await JsRuntime.InvokeVoidAsync("ShowToastr", "success", "Success Message");
+    }
+
+    private async Task TestFailure()
+    {
+        await JsRuntime.InvokeVoidAsync("ShowToastr", "error", "Error Message");
+    }
+}
