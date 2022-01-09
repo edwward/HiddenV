@@ -4,8 +4,10 @@
 <h1 class="text-danger">Parent Child</h1>
 <CascadingValue Value="@messageForGrandchild">
     <CascadingValue Value="@LuckyNumberFromGrandParent">
-        <Child OnBtnClicked="ShowMessage" Title="This is passed from parent component as parameter. Styling comes from child comp">
-            Render fragment displayed in parent from child component
+        <Child @ref="childComp"
+            OnBtnClicked="ShowMessage" 
+            Title="This is passed from parent component as parameter. Styling comes from child comp">
+                Render fragment displayed in parent from child component
         </Child>
     </CascadingValue>
 </CascadingValue>
@@ -14,8 +16,13 @@
 
 <p>@messageText</p>
 
+<div class="row">
+    <button class="btn btn-success" @onclick="()=>childComp.ShowToastrSuccess()">Show Alert</button>
+</div>
+
 @code 
 {
+    private Child childComp;
     public int LuckyNumberFromGrandParent { get; set; } = 7;
     private string messageForGrandchild = "message from grandparent component";
     private string messageText = "";
@@ -25,7 +32,7 @@
         messageText = "Text from parent";
     }
 
-    @*attribute splatting - prepisuju zde to to prichazi z child componenty AnotherChild.razor*@
+    @*attribute splatting - prepisuju zde to co prichazi z child componenty AnotherChild.razor*@
     public Dictionary<string, object> InputAttributesFromParent { get; set; } = new()
         {
             { "required", "required" },

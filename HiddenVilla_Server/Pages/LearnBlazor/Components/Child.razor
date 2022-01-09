@@ -1,4 +1,6 @@
-﻿<div>
+﻿@inject IJSRuntime JsRuntime
+
+<div>
     <div class="alert alert-info">@Title</div>
     <div class="alert alert-success">
         @if (ChildContent == null)
@@ -23,6 +25,11 @@
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
     [Parameter]
-    public EventCallback<MouseEventArgs> OnBtnClicked { get; set; } 
-    
+    public EventCallback<MouseEventArgs> OnBtnClicked { get; set; }
+
+    public async Task ShowToastrSuccess()
+    {
+        await JsRuntime.ToastrSuccess("woohhoo success message");
+    }
+
 }

@@ -1,8 +1,11 @@
 ﻿@page "/hotel-room/create"
+@page "/hotel-room/edit/{Id:int}"
+
 @using Models
 @using Business.Repository.IRepository
 @inject IHotelRoomRepository HotelRoomRepository
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">Create Hotel Room</h3>
@@ -49,22 +52,59 @@
 
 @code 
 {
+    [Parameter]
+    public int? Id { get; set; }
     private HotelRoomDto HotelRoomModel { get; set; } = new HotelRoomDto();
     private string Title { get; set; } = "Create";
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != null)
+        {
+            //updating
+            Title = "Update";
+            HotelRoomModel = await HotelRoomRepository.GetHotelRoom(Id.Value);
+        }
+        else
+        {
+            //creating
+            HotelRoomModel = new HotelRoomDto();
+        }
+    }
+
     private async Task HandleHotelRoomUpsert()
     {
-        //pokud je validace ok, muzeme pridat room
-        var roomDetailsByName = await HotelRoomRepository.IsRoomUnique(HotelRoomModel.Name);
-
-        if (roomDetailsByName != null)
+        try
         {
-            //duplicate room
-            return;
-        }
+            //pokud je validace ok, muzeme pridat room
+            var roomDetailsByName = await HotelRoomRepository.IsRoomUnique(HotelRoomModel.Name, HotelRoomModel.Id);
 
-        //create room
-        var createdResult = await HotelRoomRepository.CreateHotelRoom(HotelRoomModel);
+            if (roomDetailsByName != null)
+            {
+                //duplicate room
+                await JSRuntime.ToastrError("Room name alredy exists.");
+                return;
+            }
+
+            if (HotelRoomModel.Id != 0 && Title == "Update")
+            {
+                //update
+                var updateRoomResult = await HotelRoomRepository.UpdateHotelRoom(HotelRoomModel.Id, HotelRoomModel);
+                await JSRuntime.ToastrSuccess("Hotel room updated.");
+            }
+            else
+            {
+                //create room
+                var createdResult = await HotelRoomRepository.CreateHotelRoom(HotelRoomModel);
+                await JSRuntime.ToastrSuccess("Hotel room created.");
+            }
+        }
+        catch(Exception ex)
+        {
+            
+        }
+        
+        
         NavigationManager.NavigateTo("hotel-room");
     }
     
