@@ -3,12 +3,13 @@
 
 @using Models
 @using Business.Repository.IRepository
+
 @inject IHotelRoomRepository HotelRoomRepository
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 
 <div class="row mt-2 mb-5">
-    <h3 class="card-title text-info mb-3 ml-3">Create Hotel Room</h3>
+    <h3 class="card-title text-info mb-3 ml-3">@Title Hotel Room</h3>
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
@@ -92,6 +93,7 @@
                 var updateRoomResult = await HotelRoomRepository.UpdateHotelRoom(HotelRoomModel.Id, HotelRoomModel);
                 await JSRuntime.ToastrSuccess("Hotel room updated.");
             }
+
             else
             {
                 //create room
