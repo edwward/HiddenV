@@ -20,5 +20,8 @@ namespace DataAccess.Data
         public DateTime? CreatedDate { get; set; } = DateTime.Now;
         public string? UpdatedBy { get; set; }
         public DateTime? UpdatedDate { get; set; }
+
+        //virtual property - neni nutne delat dalsi migration
+        public virtual ICollection<HotelRoomImage> HotelRoomImages { get; set; }
     }
 }
