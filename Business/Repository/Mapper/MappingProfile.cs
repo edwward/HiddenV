@@ -17,6 +17,8 @@ namespace Business.Repository.Mapper
             //mapuj hotelroomdto na hotelroom, protoze jsou nazvy properties stejne v obou tridach, je mapovani takto jednoduche
             CreateMap<HotelRoomDto, HotelRoom>();
             CreateMap<HotelRoom, HotelRoomDto>();
+
+            CreateMap<HotelRoomImage, HotelRoomImageDto>().ReverseMap();
         }
     }
 }
