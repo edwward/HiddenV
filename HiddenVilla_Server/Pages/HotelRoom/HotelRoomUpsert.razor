@@ -41,6 +41,9 @@
                         <label>Details</label>
                         <InputTextArea @bind-Value="HotelRoomModel.Details" class="form-control"></InputTextArea>
                     </div>
+                     <div class="form-group">
+                        <InputFile OnChange="HandleImageUpload" multiple></InputFile>
+                    </div>
                      <div class="form-group mt-4">
                         <button class="btn btn-primary">@Title Room</button>
                         <NavLink href="hotel-room" class="btn btn-secondary">Back To Index</NavLink>
@@ -103,11 +106,15 @@
         }
         catch(Exception ex)
         {
-            
+
         }
-        
-        
+
+
         NavigationManager.NavigateTo("hotel-room");
     }
-    
+
+    private async Task HandleImageUpload()
+    {
+        
+    }
 }
