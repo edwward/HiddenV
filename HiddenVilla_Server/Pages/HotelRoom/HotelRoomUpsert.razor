@@ -6,6 +6,7 @@
 @using Business.Repository.IRepository
 
 @inject IHotelRoomRepository HotelRoomRepository
+@inject IHotelImagesRepository HotelImagesRepository
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject IFileUpload FileUpload
@@ -15,10 +16,10 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-               @* onvalidsubmit zajisti ze budu fungovat validace, kterou mam v hotelroomdto.cs, jeste musim nize 
-                doplnit DataAnnotationsValidator*@
+                @* onvalidsubmit zajisti ze budu fungovat validace, kterou mam v hotelroomdto.cs, jeste musim nize
+                    doplnit DataAnnotationsValidator*@
                 <EditForm Model="@HotelRoomModel" OnValidSubmit="HandleHotelRoomUpsert">
-                    <DataAnnotationsValidator/>
+                    <DataAnnotationsValidator />
                     @*<ValidationSummary/>*@
                     <div class="form-group">
                         <label>Name</label>
@@ -28,24 +29,30 @@
                     <div class="form-group">
                         <label>Occupancy</label>
                         <InputNumber @bind-Value="HotelRoomModel.Occupancy" class="form-control"></InputNumber>
-                         <ValidationMessage For="() => HotelRoomModel.Occupancy"></ValidationMessage>
+                        <ValidationMessage For="() => HotelRoomModel.Occupancy"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>Rate</label>
                         <InputNumber @bind-Value="HotelRoomModel.RegularRate" class="form-control"></InputNumber>
-                         <ValidationMessage For="() => HotelRoomModel.RegularRate"></ValidationMessage>
+                        <ValidationMessage For="() => HotelRoomModel.RegularRate"></ValidationMessage>
                     </div>
                     <div class="form-group">
                         <label>SqFt</label>
                         <InputText @bind-Value="HotelRoomModel.SqFt" class="form-control"></InputText>
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <label>Details</label>
                         <InputTextArea @bind-Value="HotelRoomModel.Details" class="form-control"></InputTextArea>
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <InputFile OnChange="HandleImageUpload" multiple></InputFile>
                         <div class="row">
+                            @if (IsImageUploadProcessStarted)
+                            {
+                                <div class="col-md-12">
+                                    <span><i class="fa fa-spin fa-spinner"></i>Please wait... uploading images...</span>
+                                </div>
+                            }
                             @if (HotelRoomModel.ImageUrls != null && HotelRoomModel.ImageUrls.Count > 0)
                             {
                                 int serial = 1;
@@ -55,16 +62,16 @@
                                         <div class="room-image" style="background: url('@roomImage') 50% 50%;">
                                             <span class="room-image-title">@serial</span>
                                         </div>
-                                        <button type="button" class="btn btn-outline-danger mt-4">
+                                        <button type="button" @onclick="() => DeletePhoto(roomImage)" class="btn btn-outline-danger mt-4">
                                             Delete
                                         </button>
                                     </div>
                                     serial++;
-                                } 
+                                }
                             }
                         </div>
                     </div>
-                     <div class="form-group mt-4">
+                    <div class="form-group mt-4">
                         <button class="btn btn-primary">@Title Room</button>
                         <NavLink href="hotel-room" class="btn btn-secondary">Back To Index</NavLink>
                     </div>
@@ -74,12 +81,15 @@
     </div>
 </div>
 
-@code 
+@code
 {
     [Parameter]
     public int? Id { get; set; }
     private HotelRoomDto HotelRoomModel { get; set; } = new HotelRoomDto();
+    private HotelRoomImageDto RoomImage { get; set; } = new HotelRoomImageDto();
     private string Title { get; set; } = "Create";
+    private List<string> DeletedImageNames { get; set; } = new List<string>();
+    private bool IsImageUploadProcessStarted { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,6 +98,10 @@
             //updating
             Title = "Update";
             HotelRoomModel = await HotelRoomRepository.GetHotelRoom(Id.Value);
+            if (HotelRoomModel?.HotelRoomImages != null)
+            {
+                HotelRoomModel.ImageUrls = HotelRoomModel.HotelRoomImages.Select(u => u.RoomImageUrl).ToList();
+            }
         }
         else
         {
@@ -114,6 +128,23 @@
             {
                 //update
                 var updateRoomResult = await HotelRoomRepository.UpdateHotelRoom(HotelRoomModel.Id, HotelRoomModel);
+                //add new images only
+                if (HotelRoomModel.ImageUrls != null && HotelRoomModel.ImageUrls.Any())
+                {
+                    //are there any images to be deleted?
+                    if (DeletedImageNames != null && DeletedImageNames.Any())
+                    {
+                        foreach (var deletedImageName in DeletedImageNames)
+                        {
+                            var imageName = deletedImageName.Replace($"RoomImages/", "");
+                            var result = FileUpload.DeleteFile(imageName); //delete actual image file
+
+                            //delete image by url
+                            await HotelImagesRepository.DeleteHotelRoomImageByImageUrl(deletedImageName);
+                        }
+                    }
+                    await AddHotelRoomImage(updateRoomResult);
+                }
                 await JSRuntime.ToastrSuccess("Hotel room updated.");
             }
 
@@ -121,10 +152,12 @@
             {
                 //create room
                 var createdResult = await HotelRoomRepository.CreateHotelRoom(HotelRoomModel);
+                //add image
+                await AddHotelRoomImage(createdResult);
                 await JSRuntime.ToastrSuccess("Hotel room created.");
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
 
         }
@@ -135,13 +168,14 @@
 
     private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
+        IsImageUploadProcessStarted = true;
         try
         {
             var images = new List<string>();
             //files were uploaded
-            if (e.GetMultipleFiles().Count > 0) 
+            if (e.GetMultipleFiles().Count > 0)
             {
-                foreach(var file in e.GetMultipleFiles())
+                foreach (var file in e.GetMultipleFiles())
                 {
                     FileInfo fileInfo = new FileInfo(file.Name);
                     if (fileInfo.Extension.ToLower() == ".jpg" ||
@@ -175,8 +209,54 @@
                     return;
                 }
             }
+            IsImageUploadProcessStarted = false;
         }
-        catch(Exception ex)
+        catch (Exception ex)
+        {
+            await JSRuntime.ToastrError(ex.Message);
+        }
+    }
+
+    private async Task AddHotelRoomImage(HotelRoomDto roomDetails)
+    {
+        foreach (var imageUrl in HotelRoomModel.ImageUrls)
+        {
+            //check if the image url already exist, if count is 0, add new image
+            if (HotelRoomModel.HotelRoomImages == null ||
+                        HotelRoomModel.HotelRoomImages
+                        .Where(i => i.RoomImageUrl == imageUrl).Count() == 0)
+            {
+                RoomImage = new HotelRoomImageDto()
+                    {
+                        RoomId = roomDetails.Id,
+                        RoomImageUrl = imageUrl
+                    };
+                await HotelImagesRepository.CreateHotelRoomImage(RoomImage);
+            }
+        }
+    }
+
+    internal async Task DeletePhoto(string imageUrl)
+    {
+        try
+        {
+            var imageIndex = HotelRoomModel.ImageUrls.FindIndex(i => i == imageUrl);
+            var imageName = imageUrl.Replace($"RoomImages/", "");
+            //delete image from create room screen
+            if (HotelRoomModel.Id == 0 && Title == "Create")
+            {
+                var result = FileUpload.DeleteFile(imageName); //delete actual image file
+            }
+            //delete image from update room screen
+            else
+            {
+                DeletedImageNames ??= new List<string>(); //pokud je list null, vytvor novy
+                DeletedImageNames.Add(imageUrl);        //track images to be delete later
+            }
+
+            HotelRoomModel.ImageUrls.RemoveAt(imageIndex); // delete image url
+        }
+        catch (Exception ex)
         {
             await JSRuntime.ToastrError(ex.Message);
         }
