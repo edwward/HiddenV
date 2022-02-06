@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace Business.Repository
 {
-    public class HotelRoomImagesRepository : IHotelImagesRepository
+    public class HotelImagesRepository : IHotelImagesRepository
     {
         private readonly AppDbContext _db;
         private readonly IMapper _mapper;
 
         //mapper musi byt i v program.cs
-        public HotelRoomImagesRepository(AppDbContext db, IMapper mapper)
+        public HotelImagesRepository(AppDbContext db, IMapper mapper)
         {
             _mapper = mapper;
             _db = db;

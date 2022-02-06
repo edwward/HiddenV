@@ -1,12 +1,14 @@
 ﻿@page "/hotel-room/create"
 @page "/hotel-room/edit/{Id:int}"
 
+@using HiddenVilla_Server.Service.IService
 @using Models
 @using Business.Repository.IRepository
 
 @inject IHotelRoomRepository HotelRoomRepository
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject IFileUpload FileUpload
 
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">@Title Hotel Room</h3>
@@ -43,6 +45,24 @@
                     </div>
                      <div class="form-group">
                         <InputFile OnChange="HandleImageUpload" multiple></InputFile>
+                        <div class="row">
+                            @if (HotelRoomModel.ImageUrls != null && HotelRoomModel.ImageUrls.Count > 0)
+                            {
+                                int serial = 1;
+                                foreach (var roomImage in HotelRoomModel.ImageUrls)
+                                {
+                                    <div class="col-md-2 mt-3">
+                                        <div class="room-image" style="background: url('@roomImage') 50% 50%;">
+                                            <span class="room-image-title">@serial</span>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-danger mt-4">
+                                            Delete
+                                        </button>
+                                    </div>
+                                    serial++;
+                                } 
+                            }
+                        </div>
                     </div>
                      <div class="form-group mt-4">
                         <button class="btn btn-primary">@Title Room</button>
@@ -113,8 +133,52 @@
         NavigationManager.NavigateTo("hotel-room");
     }
 
-    private async Task HandleImageUpload()
+    private async Task HandleImageUpload(InputFileChangeEventArgs e)
     {
-        
+        try
+        {
+            var images = new List<string>();
+            //files were uploaded
+            if (e.GetMultipleFiles().Count > 0) 
+            {
+                foreach(var file in e.GetMultipleFiles())
+                {
+                    FileInfo fileInfo = new FileInfo(file.Name);
+                    if (fileInfo.Extension.ToLower() == ".jpg" ||
+                           fileInfo.Extension.ToLower() == ".png" ||
+                            fileInfo.Extension.ToLower() == ".jpeg")
+                    {
+                        var uploadedImagePath = await FileUpload.UploadFile(file);
+                        images.Add(uploadedImagePath);
+                    }
+                    else
+                    {
+                        await JSRuntime.ToastrError("File extension invalid! Give me jpg, png, or jpeg.");
+                        return;
+                    }
+                }
+                if (images.Any())
+                {
+                    if (HotelRoomModel.ImageUrls != null && HotelRoomModel.ImageUrls.Any())
+                    {
+                        HotelRoomModel.ImageUrls.AddRange(images);
+                    }
+                    else
+                    {
+                        HotelRoomModel.ImageUrls = new List<string>();
+                        HotelRoomModel.ImageUrls.AddRange(images);
+                    }
+                }
+                else
+                {
+                    await JSRuntime.ToastrError("Image uploading failed!");
+                    return;
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            await JSRuntime.ToastrError(ex.Message);
+        }
     }
 }
