@@ -55,12 +55,13 @@
     </div>
 </div>
 
-<DeleteConfirmation ConfirmationChanged="ConfirmDelete_Click"></DeleteConfirmation>
+<DeleteConfirmation IsParentComponentProcessing="IsProcessing" ConfirmationChanged="ConfirmDelete_Click"></DeleteConfirmation>
 
 @code 
 {
     private IEnumerable<HotelRoomDto> HotelRooms { get; set; } = new List<HotelRoomDto>();
     private int? DeleteRoomId { get; set; } = null;
+    private bool IsProcessing { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -77,6 +78,7 @@
     //delete kdyz user klikne na delete v modalu (delete confimation)
     public async Task ConfirmDelete_Click(bool IsConfirmed)
     {
+        IsProcessing = true;
         if (IsConfirmed && DeleteRoomId != null)
         {
             //delete all images in hotel room
@@ -91,7 +93,8 @@
             await JSRuntime.ToastrSuccess("Hotel Room Deleted");
             HotelRooms = await HotelRoomRepository.GetAllHotelRooms();
         }
-    //bootstrap modal go away kdyz dojde k delete room
-     await JSRuntime.InvokeVoidAsync("HideDeleteconfirmationModal");
+        //bootstrap modal go away kdyz dojde k delete room
+        await JSRuntime.InvokeVoidAsync("HideDeleteconfirmationModal");
+        IsProcessing = false;
     }
 }
