@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="..\HiddenVilla_Server\Pages\HotelRoom\HotelRoomList.razor" Link="HotelRoomList.razor" />
+  </ItemGroup>
+
 </Project>
