@@ -10,6 +10,7 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject IFileUpload FileUpload
+@inject NavigationManager NavigationManager
 
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">@Title Hotel Room</h3>
@@ -195,7 +196,7 @@
                     {
                         foreach (var deletedImageName in DeletedImageNames)
                         {
-                            var imageName = deletedImageName.Replace($"RoomImages/", "");
+                            var imageName = deletedImageName.Replace($"{NavigationManager.BaseUri}RoomImages/", "");
                             var result = FileUpload.DeleteFile(imageName); //delete actual image file
 
                             //delete image by url
@@ -310,7 +311,7 @@
         try
         {
             var imageIndex = HotelRoomModel.ImageUrls.FindIndex(i => i == imageUrl);
-            var imageName = imageUrl.Replace($"RoomImages/", "");
+            var imageName = imageUrl.Replace($"{NavigationManager.BaseUri}RoomImages/", "");
             //delete image from create room screen
             if (HotelRoomModel.Id == 0 && Title == "Create")
             {
