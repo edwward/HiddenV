@@ -11,6 +11,8 @@
 @inject IJSRuntime JSRuntime
 @inject IFileUpload FileUpload
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = Common.SD.Role_Admin)] 
+
 
 <div class="row mt-2 mb-5">
     <h3 class="card-title text-info mb-3 ml-3">@Title Hotel Room</h3>
@@ -125,8 +127,17 @@
     private bool IsImageUploadProcessStarted { get; set; } = false;
     public BlazoredTextEditor QuillHtml { get; set; } = new BlazoredTextEditor();
 
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthenticationState { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
+        var authenticationState = await AuthenticationState;
+        if (!authenticationState.User.IsInRole(Common.SD.Role_Admin))
+        {
+            var uri = new Uri(NavigationManager.Uri);
+            NavigationManager.NavigateTo($"/Identity/Account/Login?returnUrl={uri.LocalPath}");
+        }
         if (Id != null)
         {
             //updating
