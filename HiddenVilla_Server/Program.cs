@@ -31,10 +31,16 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IHotelRoomRepository, HotelRoomRepository>();
 builder.Services.AddScoped<IAmenityRepository, AmenityRepository>();
 builder.Services.AddScoped<IHotelImagesRepository, HotelImagesRepository>();
+builder.Services.AddScoped<IDbInitiliazer, DbInitializer>();
 builder.Services.AddScoped<IFileUpload, FileUpload>();
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+
+using var scope = app.Services.CreateScope();
+IDbInitiliazer context = scope.ServiceProvider.GetRequiredService<IDbInitiliazer>();
+context.Initialize();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -51,6 +57,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapBlazorHub();
 app.MapRazorPages();
