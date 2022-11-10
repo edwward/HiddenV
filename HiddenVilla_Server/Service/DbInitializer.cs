@@ -15,7 +15,9 @@ namespace HiddenVilla_Server.Service
         private readonly RoleManager<IdentityRole> _roleManager;
 
 
-        public DbInitializer(AppDbContext db, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public DbInitializer(AppDbContext db, 
+            UserManager<IdentityUser> userManager, 
+            RoleManager<IdentityRole> roleManager)
         {
             _db = db;
             _userManager = userManager;
@@ -46,6 +48,7 @@ namespace HiddenVilla_Server.Service
             _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer)).GetAwaiter().GetResult();
             _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee)).GetAwaiter().GetResult();
 
+            //vytvor usera
             _userManager.CreateAsync(new IdentityUser
             {
                 UserName = "efeuereis@gmail.com",
