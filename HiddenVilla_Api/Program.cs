@@ -3,6 +3,8 @@ using Business.Repository;
 using DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using HiddenVilla_Api.Helper;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 //stejny applicationuser service jako identityuser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
+//pro api settings - kod nize vyplni tridu ApiSettings a jeji property udaji z appsettings.json
+var appSettingsSection = builder.Configuration.GetSection("APISettings");
+builder.Services.Configure<ApiSettings>(appSettingsSection);
 
 //stejny automapper i repositories jako v hiddenvilla_server projektu
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

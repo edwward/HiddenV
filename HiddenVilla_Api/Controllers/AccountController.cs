@@ -1,9 +1,15 @@
 ﻿using Common;
 using DataAccess.Data;
+using HiddenVilla_Api.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace HiddenVilla_Api.Controllers
 {
@@ -16,13 +22,16 @@ namespace HiddenVilla_Api.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApiSettings _apiSettings;
 
         public AccountController(SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+            UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager,
+            IOptions<ApiSettings> options)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _roleManager = roleManager;
+            _apiSettings = options.Value;
         }
 
         //ackoli mam nahore authorize tag, na endpoint s registraci bude moci u neautorizovany uzivatel
@@ -89,7 +98,66 @@ namespace HiddenVilla_Api.Controllers
                 }
 
                 //everything valid now, log in user
+                var signinCredentials = GetSigningCredentials();
+                var claims = await GetClaims(user);
+
+                var tokenOptions = new JwtSecurityToken(
+                    issuer: _apiSettings.ValidIssuer,
+                    audience: _apiSettings.ValidAudience,
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(30),
+                    signingCredentials: signinCredentials);
+
+                var token = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+                return Ok(new AuthenticationResponseDTO
+                {
+                    IsAuthenticationSuccessful = true,
+                    Token = token,
+                    userDTO = new UserDTO
+                    {
+                        Name = user.Name,
+                        Id = user.Id,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber
+                    }
+                });
             }
+            else
+            {
+                return Unauthorized(new AuthenticationResponseDTO
+                {
+                    IsAuthenticationSuccessful = false,
+                    ErrorMessage = "Invalid Authentication"
+                });
+            }
+        }
+
+        //ke generovani tokenu potrebujeme signin credentials
+        private SigningCredentials GetSigningCredentials() 
+        {
+            var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_apiSettings.SecretKey));
+            return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
+        }
+
+        //jeste potrebuji vsechnu claims daneho usera
+        private async Task<List<Claim>> GetClaims(ApplicationUser user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name,user.Email),
+                new Claim(ClaimTypes.Email,user.Email),
+                new Claim("Id",user.Id),
+            };
+
+            //claim pro roli usera
+            var roles = await _userManager.GetRolesAsync(await _userManager.FindByEmailAsync(user.Email));
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            return claims;
         }
     }
 }
