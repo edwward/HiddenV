@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace Models
 {
     //pouziti k atributum ktere user bude zadavat pri registraci na webu
+    //required atributy budou viditelne kdyz pouziju k registraci swagger - bude davat info o chybach v registraci
     public class UserRequestDTO
     {
         [Required(ErrorMessage = "Name is required")]
