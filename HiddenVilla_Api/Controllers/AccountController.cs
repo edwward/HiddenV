@@ -65,5 +65,31 @@ namespace HiddenVilla_Api.Controllers
             }
             return StatusCode(201);
         }
+
+
+        //metoda pro SIGNIN operaci (uzivatel jiz registrovan)
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> SignIn([FromBody] AuthenticationDTO authenticationDTO)
+        {
+            var result = await _signInManager.PasswordSignInAsync(authenticationDTO.UserName, authenticationDTO.Password,
+                false, false);
+
+            if (result.Succeeded)
+            {
+                var user = await _userManager.FindByNameAsync(authenticationDTO.UserName);
+
+                if (user == null)
+                {
+                    return Unauthorized(new AuthenticationResponseDTO
+                    {
+                        IsAuthenticationSuccessful = false,
+                        ErrorMessage = "Invalid Authentication"
+                    });
+                }
+
+                //everything valid now, log in user
+            }
+        }
     }
 }
