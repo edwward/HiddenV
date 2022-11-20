@@ -26,6 +26,7 @@ namespace HiddenVilla_Api.Controllers
         }
 
         //ackoli mam nahore authorize tag, na endpoint s registraci bude moci u neautorizovany uzivatel
+        //metoda pro SIGNUP operaci (zcela novy uzivatel)
         [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> SignUp([FromBody] UserRequestDTO userRequestDTO)

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    //pouziti k atributum ktere user bude zadavat pri registraci na webu
-    public class RegistrationResponseDTO
+    public class AuthenticationResponseDTO
     {
-        public bool IsRegistrationSuccessful { get; set; }
+        public bool IsAuthenticationSuccessful { get; set; }
         public IEnumerable<string>? Errors { get; set; }
+        public string? Token { get; set; }
     }
 }
