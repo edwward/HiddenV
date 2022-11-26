@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "Business\Busine
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{7A4624AE-0CE3-47E4-BBCF-2F26ED64A208}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiddenVilla_Api", "HiddenVilla_Api\HiddenVilla_Api.csproj", "{4BBB0331-69B8-4CDE-A69E-EBF04F92FD4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HiddenVilla_Api", "HiddenVilla_Api\HiddenVilla_Api.csproj", "{4BBB0331-69B8-4CDE-A69E-EBF04F92FD4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiddenVilla_Client", "HiddenVilla_Client\HiddenVilla_Client.csproj", "{A94EA27E-31F8-4778-BA1E-64925D94139F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{4BBB0331-69B8-4CDE-A69E-EBF04F92FD4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4BBB0331-69B8-4CDE-A69E-EBF04F92FD4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4BBB0331-69B8-4CDE-A69E-EBF04F92FD4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A94EA27E-31F8-4778-BA1E-64925D94139F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A94EA27E-31F8-4778-BA1E-64925D94139F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A94EA27E-31F8-4778-BA1E-64925D94139F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A94EA27E-31F8-4778-BA1E-64925D94139F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
