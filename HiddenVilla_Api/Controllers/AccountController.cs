@@ -136,7 +136,7 @@ namespace HiddenVilla_Api.Controllers
         //ke generovani tokenu potrebujeme signin credentials
         private SigningCredentials GetSigningCredentials() 
         {
-            var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_apiSettings.SecretKey));
+            var secret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_apiSettings.SecretKey ?? ""));
             return new SigningCredentials(secret, SecurityAlgorithms.HmacSha256);
         }
 

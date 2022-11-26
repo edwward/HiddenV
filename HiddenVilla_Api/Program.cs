@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using HiddenVilla_Api.Helper;
 using Microsoft.Extensions.Configuration;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,31 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 //pro api settings - kod nize vyplni tridu ApiSettings a jeji property udaji z appsettings.json
 var appSettingsSection = builder.Configuration.GetSection("APISettings");
 builder.Services.Configure<ApiSettings>(appSettingsSection);
+
+//akceptace jwt tokenu
+var apiSettings = appSettingsSection.Get<ApiSettings>();
+var key = Encoding.ASCII.GetBytes(apiSettings.SecretKey ?? "");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateAudience = true,
+        ValidateIssuer = true,
+        ValidAudience = apiSettings.ValidAudience,
+        ValidIssuer = apiSettings.ValidIssuer,
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 //stejny automapper i repositories jako v hiddenvilla_server projektu
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
