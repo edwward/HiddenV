@@ -1,6 +1,8 @@
 ﻿@page "/"
 @using HiddenVilla_Client.Model.ViewModel
-
+@inject ILocalStorageService localStorage
+@inject IJSRuntime ijsRuntime
+    
 <div class="row p-0 m-0">
     <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
         <ol class="carousel-indicators">
@@ -26,7 +28,7 @@
     </div>
 </div>
 
-<EditForm Model="HomeModel">
+<EditForm Model="HomeModel" OnValidSubmit="SaveInitialData">
     <div class="row p-0 mx-0 mt-4">
 
         <div class="col-12 col-md-5  offset-md-1 pl-2  pr-2 pr-md-0">
@@ -64,5 +66,17 @@
 @code {
 
     public HomeVM HomeModel { get; set; } = new HomeVM();
+    private async Task SaveInitialData()
+    {
+        try
+        {
+            HomeModel.EndDate = HomeModel.StartDate.AddDays(HomeModel.NumberOfNights);
+            await localStorage.SetItemAsync("InitialRoomBookingInfo", HomeModel);
+        }
+        catch (Exception e)
+        {
 
- }
+            await ijsRuntime.ToastrError(e.Message);
+        }    
+    }
+}
