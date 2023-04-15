@@ -18,9 +18,13 @@ namespace Models
         public int? Occupancy { get; set; }
 
         [Range(1 ,3000, ErrorMessage = "Rate must be between 1 and 3000")]
-        public double? RegularRate { get; set; }
-        public string? Details { get; set; }
-        public string? SqFt { get; set; }
+        public double RegularRate { get; set; }
+        public string Details { get; set; }
+        public string SqFt { get; set; }
+
+        public double TotalDays { get; set; }
+        public double TotalAmount { get; set; }
+
         public virtual ICollection<HotelRoomImageDto> HotelRoomImages { get; set; }
         public List<string> ImageUrls { get; set; }
 
